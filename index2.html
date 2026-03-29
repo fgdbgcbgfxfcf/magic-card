@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Karten Trick - Magie</title>
+<style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+ background-image: url(background\ 2026-03-29\ 233904.png);
+  color: white;
+}
+
+/* Container */
+#container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Überschrift */
+h1 {
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  z-index: 10;
+  position: relative;
+}
+
+/* Button */
+button {
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  background: #b9b6aa;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+  z-index: 10;
+  position: relative;
+}
+button:hover { background: #942525; transform: scale(1.05); }
+
+/* Box */
+.box-container {
+  position: relative;
+  width: 200px;
+  height: 220px;
+  z-index: 10;
+}
+.box-container img.box-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* Karte, die aus Box kommt */
+.card {
+  width: 120px;
+  height: 180px;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0) scale(0);
+  opacity: 0;
+  z-index: 10;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  display: none;
+}
+
+.card.fly {
+  display: block;
+  animation: flyOut 1s ease forwards;
+}
+
+@keyframes flyOut {
+  0% { transform: translateX(-50%) translateY(0) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-250px) scale(1); opacity: 1; }
+}
+
+/* Fallende Karten im Hintergrund */
+.falling-card {
+  position: absolute;
+  width: 40px;
+  height: 60px;
+  background-size: cover;
+  pointer-events: none;
+  animation: fall linear infinite;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+<div id="container">
+
+
+  
+
+  <div class="box-container" onclick="manualTrigger()">
+    <img src="Screenshot 2026-03-29 234901.png" alt="Kartenbox" class="box-image">
+    <img src="" alt="Karte" id="card" class="card">
+  </div>
+<button onclick="manualTrigger()"> Karte erscheinen lassen</button>
+</div>
+
+<script>
+// Karte aus LocalStorage holen
+let selectedCard = localStorage.getItem('trickCardImage') || null;
+let ready = true;
+const card = document.getElementById('card');
+if (selectedCard) {
+  card.src = selectedCard;
+  card.style.display = 'block';
+}
+
+function manualTrigger() {
+  if (!ready) return;
+  card.classList.add('fly');
+  ready = false;
+}
+
+// Shake Detection
+let lastX = null, lastY = null, lastZ = null;
+window.addEventListener('devicemotion', function(event) {
+  if (!ready) return;
+  let acc = event.accelerationIncludingGravity;
+  if (!acc) return;
+  if (lastX !== null) {
+    let delta = Math.abs(acc.x + acc.y + acc.z - lastX - lastY - lastZ);
+    if (delta > 25) manualTrigger();
+  }
+  lastX = acc.x; lastY = acc.y; lastZ = acc.z;
+});
+
+// Hintergrundkarten animieren
+const cards = [
+  'herz ass 2026-03-29 223829.png',
+  'pik könig 2026-03-29 224024.png',
+  'karo7 2026-03-29 224156.png',
+  'herz dame 2026-03-29 224312.png'
+];
+
+for (let i = 0; i < 30; i++) {
+  const cardElem = document.createElement('div');
+  cardElem.className = 'falling-card';
+  cardElem.style.backgroundImage = `url(${cards[Math.floor(Math.random()*cards.length)]})`;
+  cardElem.style.left = Math.random()*100 + 'vw';
+  cardElem.style.animationDuration = (5 + Math.random()*5) + 's';
+  cardElem.style.animationDelay = Math.random()*5 + 's';
+  document.body.appendChild(cardElem);
+}
+</script>
+</body>
+</html>
